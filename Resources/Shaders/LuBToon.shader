@@ -22,6 +22,8 @@ Shader "LuB/NewToon"
         
         [Space(20)]
         [Toggle(USE_FRESNEL)] _UseFresnel ("Use Fresnel", Float) = 0
+        [Toggle(USE_FRESNEL_REFLECT)] _UseFresnelReflect ("Use Fresnel Reflect", Float) = 0
+        _SpecularTexture ("Specular Texture", CUBE) = "white" {}
         _FresnelColor ("Fresnel Color", Color) = (1,1,1,1)
         _FresnelBase ("Fresnel Base", Range(0, 1)) = 0
         
@@ -57,6 +59,7 @@ Shader "LuB/NewToon"
             #pragma shader_feature USE_FOG
             #pragma shader_feature USE_SPECULAR
             #pragma shader_feature USE_FRESNEL
+            #pragma shader_feature USE_FRESNEL_REFLECT
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -102,6 +105,8 @@ Shader "LuB/NewToon"
             fixed4 _FresnelColor;
             fixed _FresnelBase;
 
+            samplerCUBE _SpecularTexture;
+
             v2f vert (appdata v)
             {
                 UNITY_SETUP_INSTANCE_ID(v);
@@ -143,7 +148,15 @@ Shader "LuB/NewToon"
 
                 fresnel *= _FresnelColor.a;
 
-                return color + fresnel * _FresnelColor.rgb;
+                #ifdef USE_FRESNEL_REFLECT
+                const fixed4 refSample = texCUBE(_SpecularTexture, normWorld);
+
+                fixed3 fresnelComp = lerp(0, refSample.rgb, min(refSample.a, fresnel));
+                #else
+                fixed3 fresnelComp = fresnel * _FresnelColor.rgb;
+                #endif
+
+                return color + fresnelComp;
             }
 
             inline fixed3 ApplyShadows (fixed3 color, fixed fong, v2f i, out fixed shadow)
