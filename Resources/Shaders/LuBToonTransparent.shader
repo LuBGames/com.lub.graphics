@@ -1,4 +1,4 @@
-Shader "LuB/NewToon"
+Shader "LuB/NewToonTransparent"
 {
     Properties
     {
@@ -41,7 +41,9 @@ Shader "LuB/NewToon"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
+        ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
         
         Stencil
         {
@@ -59,14 +61,11 @@ Shader "LuB/NewToon"
             #pragma fragment frag
 
             #pragma multi_compile_instancing
-
-            #pragma shader_feature SHADOWS_SCREEN
             
             #pragma shader_feature USE_FOG
             #pragma shader_feature USE_SPECULAR
             #pragma shader_feature USE_FRESNEL
             #pragma shader_feature USE_FRESNEL_REFLECT
-            #pragma shader_feature USE_BAKED_SHADOWS
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -91,7 +90,6 @@ Shader "LuB/NewToon"
                 float4 vertex : SV_POSITION;
                 float3 worldNormal : NORMAL;
                 float3 worldPos : TEXCOORD4;
-                unityShadowCoord4 _ShadowCoord : TEXCOORD1;
             };
 
             sampler2D _MainTex;
@@ -114,9 +112,6 @@ Shader "LuB/NewToon"
 
             samplerCUBE _SpecularTexture;
 
-            sampler2D _BakedShadows;
-            float4 _BakedShadows_ST;
-
             v2f vert (appdata v)
             {
                 UNITY_SETUP_INSTANCE_ID(v);
@@ -128,12 +123,10 @@ Shader "LuB/NewToon"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 
-                TRANSFER_SHADOW(o);
-                
                 return o;
             }
 
-            inline fixed3 ApplySpecular (fixed3 color, fixed shadow, v2f i)
+            inline fixed4 ApplySpecular (fixed4 color, v2f i)
             {
                 const fixed3 normWorld = normalize(i.worldNormal);
                 const fixed3 normLightDir = normalize(_WorldSpaceLightPos0);
@@ -142,12 +135,10 @@ Shader "LuB/NewToon"
                 const fixed dotRef = max(0, dot(refLight, viewVec));
                 const fixed spec = pow(dotRef, 32.0 * _SpecularSize);
 
-                const fixed blendSpec = _SpecularColor.a * smoothstep(0,1, shadow);
-
-                return color + lerp(0, spec, blendSpec) * _SpecularColor.rgb;
+                return fixed4(color + lerp(0, spec, _SpecularColor.a) * _SpecularColor.rgb, max(color.a, spec));
             }
 
-            inline fixed3 ApplyFresnel(fixed3 color, fixed shadow, v2f i)
+            inline fixed4 ApplyFresnel(fixed4 color, v2f i)
             {
                 const fixed3 normWorld = normalize(i.worldNormal);
                 const fixed3 viewVec = normalize(i.worldPos - _WorldSpaceCameraPos);
@@ -161,18 +152,13 @@ Shader "LuB/NewToon"
                 #ifdef USE_FRESNEL_REFLECT
                 const fixed4 refSample = texCUBE(_SpecularTexture, normWorld);
 
+                fresnel = min(refSample.r, fresnel);
                 fixed3 fresnelComp = lerp(0, refSample.rgb, fresnel);
                 #else
                 fixed3 fresnelComp = fresnel * _FresnelColor.rgb;
                 #endif
 
-                return color + fresnelComp;
-            }
-            
-            inline fixed3 ApplyShadows (fixed3 color, fixed fong, fixed shadow)
-            {
-                shadow = lerp(1, shadow, max(fong, 0));
-                return color * shadow;
+                return fixed4(color + fresnelComp, max(color.a, fresnel));
             }
 
             inline fixed3 ApplyShading (fixed3 color, fixed fong)
@@ -188,27 +174,12 @@ Shader "LuB/NewToon"
 
                 const fixed fong = dot(_WorldSpaceLightPos0.xyz, normalize(i.worldNormal));
 
-                #ifdef SHADOWS_SCREEN
-                fixed shadow = LIGHT_ATTENUATION(i);
-                #else
-                fixed shadow = 1;
-                #endif
-
-                #ifdef USE_BAKED_SHADOWS
-                shadow = min(1-tex2D(_BakedShadows, i.uv * _BakedShadows_ST.xy).r, shadow);
-                shadow = max(_LightShadowData.x, shadow);
-                #endif
-
-                #if defined(SHADOWS_SCREEN) || defined(USE_BAKED_SHADOWS)
-                col.rgb = ApplyShadows(col, fong, shadow);
-                #endif
-
                 #ifdef USE_FRESNEL
-                col.rgb = ApplyFresnel(col, shadow, i);
+                col = ApplyFresnel(col, i);
                 #endif
 
                 #ifdef USE_SPECULAR
-                col.rgb = ApplySpecular(col, shadow, i);
+                col = ApplySpecular(col, i);
                 #endif
 
                 col.rgb = ApplyShading(col, fong);
