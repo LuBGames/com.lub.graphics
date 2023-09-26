@@ -34,6 +34,10 @@ Shader "LuB/NewToon"
         [IntRange] _Stencil ("Stencil ID", Range(0, 255)) = 0
         [IntRange] _StencilComp ("Stencil Comparison", Range(0, 8)) = 8
         [IntRange] _StencilOp ("Stencil Operation", Range(0, 7)) = 0
+        
+        [Space(20)]
+        [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
+        _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
     }
     SubShader
     {
@@ -55,11 +59,14 @@ Shader "LuB/NewToon"
             #pragma fragment frag
 
             #pragma multi_compile_instancing
-            #pragma multi_compile_fwdadd_fullshadows
+
+            #pragma shader_feature SHADOWS_SCREEN
+            
             #pragma shader_feature USE_FOG
             #pragma shader_feature USE_SPECULAR
             #pragma shader_feature USE_FRESNEL
             #pragma shader_feature USE_FRESNEL_REFLECT
+            #pragma shader_feature USE_BAKED_SHADOWS
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -107,6 +114,9 @@ Shader "LuB/NewToon"
 
             samplerCUBE _SpecularTexture;
 
+            sampler2D _BakedShadows;
+            float4 _BakedShadows_ST;
+
             v2f vert (appdata v)
             {
                 UNITY_SETUP_INSTANCE_ID(v);
@@ -118,7 +128,7 @@ Shader "LuB/NewToon"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 
-                TRANSFER_VERTEX_TO_FRAGMENT(o);
+                TRANSFER_SHADOW(o);
                 
                 return o;
             }
@@ -158,10 +168,10 @@ Shader "LuB/NewToon"
 
                 return color + fresnelComp;
             }
-
-            inline fixed3 ApplyShadows (fixed3 color, fixed fong, v2f i, out fixed shadow)
+            
+            inline fixed3 ApplyShadows (fixed3 color, fixed fong, fixed shadow)
             {
-                shadow = lerp(1, LIGHT_ATTENUATION(i), max(fong, 0));
+                shadow = lerp(1, shadow, max(fong, 0));
                 return color * shadow;
             }
 
@@ -178,8 +188,20 @@ Shader "LuB/NewToon"
 
                 const fixed fong = dot(_WorldSpaceLightPos0.xyz, normalize(i.worldNormal));
 
-                fixed shadow;
-                col.rgb = ApplyShadows(col, fong, i, shadow);
+                #ifdef SHADOWS_SCREEN
+                fixed shadow = LIGHT_ATTENUATION(i);
+                #else
+                fixed shadow = 1;
+                #endif
+
+                #ifdef USE_BAKED_SHADOWS
+                shadow = min(1-tex2D(_BakedShadows, i.uv * _BakedShadows_ST.xy).r, shadow);
+                shadow = max(_LightShadowData.x, shadow);
+                #endif
+
+                #if defined(SHADOWS_SCREEN) || defined(USE_BAKED_SHADOWS)
+                col.rgb = ApplyShadows(col, fong, shadow);
+                #endif
 
                 #ifdef USE_FRESNEL
                 col.rgb = ApplyFresnel(col, shadow, i);
