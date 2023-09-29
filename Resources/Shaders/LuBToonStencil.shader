@@ -1,4 +1,4 @@
-Shader "LuB/NewToon"
+Shader "LuB/NewToonStencil"
 {
     Properties
     {
@@ -31,12 +31,24 @@ Shader "LuB/NewToon"
         [Toggle(USE_FOG)] _UseFog ("Use fog", Float) = 0
         
         [Space(20)]
+        [IntRange] _Stencil ("Stencil ID", Range(0, 255)) = 0
+        [IntRange] _StencilComp ("Stencil Comparison", Range(0, 8)) = 8
+        [IntRange] _StencilOp ("Stencil Operation", Range(0, 7)) = 0
+        
+        [Space(20)]
         [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
         _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
+        
+        Stencil
+        {
+            Ref [_Stencil]
+            Comp [_StencilComp]
+            Pass [_StencilOp]
+        }
 
         Pass
         {

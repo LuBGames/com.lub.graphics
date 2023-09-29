@@ -31,11 +31,6 @@ Shader "LuB/NewToonTransparent"
         [Toggle(USE_FOG)] _UseFog ("Use fog", Float) = 0
         
         [Space(20)]
-        [IntRange] _Stencil ("Stencil ID", Range(0, 255)) = 0
-        [IntRange] _StencilComp ("Stencil Comparison", Range(0, 8)) = 8
-        [IntRange] _StencilOp ("Stencil Operation", Range(0, 7)) = 0
-        
-        [Space(20)]
         [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
         _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
     }
@@ -44,13 +39,6 @@ Shader "LuB/NewToonTransparent"
         Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
-        
-        Stencil
-        {
-            Ref [_Stencil]
-            Comp [_StencilComp]
-            Pass [_StencilOp]
-        }
 
         Pass
         {
@@ -71,8 +59,9 @@ Shader "LuB/NewToonTransparent"
             #include "AutoLight.cginc"
 
             #ifdef USE_FOG
-            #include "fog.cginc"
+            #include "fogTransparent.cginc"
             #endif
+            
 
             struct appdata
             {

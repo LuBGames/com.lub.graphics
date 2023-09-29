@@ -2,6 +2,7 @@
 #define CUSTOM_FOG_INCLUDED
 
 #include "skybox.cginc"
+#include "lub.cginc"
 
 fixed3 FogOffset;
 fixed3 FogAxis;
@@ -15,10 +16,11 @@ fixed GetFog (fixed3 pos)
     return clamp((fx - FogOffset) * FogScale, 0.0, 1.0);
 }
 
-inline fixed3 ApplyFog (fixed3 color, v2f i)
+inline Surface ApplyFog (Surface surface)
 {
-    const fixed3 fogCoord = normalize(i.worldPos - _WorldSpaceCameraPos);
-    return lerp(color, GetSkyboxColor(fogCoord), GetFog(i.worldPos));
+    const fixed3 fogCoord = normalize(surface.position - _WorldSpaceCameraPos);
+    surface.color = lerp(surface.color, GetSkyboxColor(fogCoord), GetFog(surface.position));
+    return surface;
 }
 
 #endif
