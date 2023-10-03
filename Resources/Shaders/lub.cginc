@@ -83,7 +83,8 @@ inline Surface ApplyShading (Surface surface)
 {
     fixed fong = smoothstep(_LitTrashHold - _LitSoftness*2, _LitTrashHold + _LitSoftness, surface.fong);
     fong = saturate(fong);
-    surface.color *= max(_ShadingColor, fong);
+    //surface.color *= max(_ShadingColor, fong);
+    surface.color = lerp(_ShadingColor * surface.color, surface.color, fong);
     return surface;
 }
 
