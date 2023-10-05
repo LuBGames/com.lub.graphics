@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
-namespace LuBGraphics.ShadowBaker
+namespace LuBGraphics.ShadowBaker.Editor
 {
     [ExecuteAlways]
     public class Baker : MonoBehaviour
