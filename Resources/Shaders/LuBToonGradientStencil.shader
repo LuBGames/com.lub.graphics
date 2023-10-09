@@ -117,7 +117,7 @@ Shader "LuB/NewToonGradientStencil"
             {
                 const fixed d = saturate(smoothstep((1-_SmoothGradient)*_SizeGradient, _SizeGradient,length((i.uv-0.5)*half2(_RatioGradient, 1))));
                 
-                fixed3 col = tex2D(_MainTex, i.uv).rgb * lerp(_Color, _ColorTwo, d) * _Multiply;
+                fixed3 col = tex2D(_MainTex, i.uv).rgb * lerp(_Color, _ColorTwo, min(d, _Color.a)) * _Multiply;
 
                 const half3 worldNormal = normalize(i.worldNormal);
 
