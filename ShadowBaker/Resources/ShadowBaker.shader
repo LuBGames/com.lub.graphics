@@ -13,7 +13,6 @@
 
 			#pragma shader_feature SHADOWS_SCREEN
 			
-			#include "UnityCG.cginc"
 			#include "AutoLight.cginc"
 
 			struct appdata
@@ -41,9 +40,8 @@
 			fixed4 frag (v2f i) : SV_Target
 			{
 				unityShadowCoord dist = SAMPLE_DEPTH_TEXTURE(_Shadows, i._ShadowCoord.xy);
-                unityShadowCoord lightShadowDataX = _LightShadowData.x;
                 unityShadowCoord threshold = i._ShadowCoord.z;
-                fixed at = max(dist > threshold, lightShadowDataX);
+                fixed at = max(dist > threshold, 0);
 				return fixed4(at,at,at,1);
 			}
 			ENDCG
