@@ -79,6 +79,7 @@ Shader "LuB/NewToon"
 
             FragData vert (appdata v)
             {
+            
                 UNITY_SETUP_INSTANCE_ID(v);
                 
                 FragData o;
