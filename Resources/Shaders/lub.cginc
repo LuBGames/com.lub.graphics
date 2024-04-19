@@ -71,7 +71,7 @@ inline Surface ApplyFresnel(Surface surface)
 inline Surface ApplyShadows (Surface surface)
 {
     fixed shadow = lerp(1, surface.shadow, max(surface.fong, 0));
-    surface.color *= shadow;
+    surface.color *= lerp(unity_ShadowColor, 1, shadow);
     return surface;
 }
 
@@ -83,8 +83,11 @@ inline Surface ApplyShading (Surface surface)
 {
     fixed fong = smoothstep(_LitTrashHold - _LitSoftness*2, _LitTrashHold + _LitSoftness, surface.fong);
     fong = saturate(fong);
-    //surface.color *= max(_ShadingColor, fong);
+    #if defined(USE_SHADOW_COLOR_FOR_SHADING)
+    surface.color = lerp(unity_ShadowColor * surface.color, surface.color, fong);
+    #else
     surface.color = lerp(_ShadingColor * surface.color, surface.color, fong);
+    #endif
     return surface;
 }
 

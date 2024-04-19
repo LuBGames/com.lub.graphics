@@ -71,6 +71,7 @@ Shader "LuB/NewToonGradientStencil"
             #pragma shader_feature USE_FRESNEL
             #pragma shader_feature USE_FRESNEL_REFLECT
             #pragma shader_feature USE_BAKED_SHADOWS
+            #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
