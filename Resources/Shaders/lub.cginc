@@ -1,6 +1,8 @@
 ﻿#ifndef CUSTOM_LUB_INCLUDED
 #define CUSTOM_LUB_INCLUDED
 
+#include "UnityLightingCommon.cginc"
+
 struct Surface
 {
     half3 color;
@@ -16,6 +18,7 @@ struct FragData
     float3 worldNormal : NORMAL;
     float2 uv : TEXCOORD0;
     float2 uv2 : TEXCOORD1;
+    half3 color : COLOR;
     unityShadowCoord4 _ShadowCoord : TEXCOORD3;
     float3 worldPos : TEXCOORD4;
 };
@@ -33,7 +36,7 @@ inline Surface ApplySpecular (Surface surface)
 
     const fixed blendSpec = _SpecularColor.a * smoothstep(0,1, surface.shadow);
 
-    surface.color += lerp(0, spec, blendSpec) * _SpecularColor.rgb;
+    surface.color += lerp(0, spec, blendSpec) * _SpecularColor.rgb * _LightColor0.rgb;
 
     return surface;
 }
@@ -58,9 +61,9 @@ inline Surface ApplyFresnel(Surface surface)
     #ifdef USE_FRESNEL_REFLECT
     const fixed4 refSample = texCUBE(_SpecularTexture, surface.normal);
 
-    fixed3 fresnelComp = lerp(0, refSample.rgb * _FresnelColor.rgb, fresnel);
+    fixed3 fresnelComp = lerp(0, refSample.rgb * _FresnelColor.rgb * _LightColor0.rgb, fresnel);
     #else
-    fixed3 fresnelComp = fresnel * _FresnelColor.rgb;
+    fixed3 fresnelComp = fresnel * _FresnelColor.rgb * _LightColor0.rgb;
     #endif
 
     surface.color += fresnelComp;

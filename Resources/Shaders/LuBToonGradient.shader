@@ -64,6 +64,7 @@ Shader "LuB/NewToonGradient"
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "baseFragment.cginc"
+            #include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -96,6 +97,7 @@ Shader "LuB/NewToonGradient"
                 o.uv2 = v.uv2;
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.color = _LightColor0 * _Multiply;
                 
                 TRANSFER_SHADOW(o);
                 
@@ -106,7 +108,7 @@ Shader "LuB/NewToonGradient"
             {
                 const fixed d = saturate(smoothstep((1-_SmoothGradient)*_SizeGradient, _SizeGradient,length((i.uv-0.5)*half2(_RatioGradient, 1))));
                 
-                fixed3 col = tex2D(_MainTex, i.uv).rgb * lerp(_Color, _ColorTwo, d) * _Multiply;
+                fixed3 col = tex2D(_MainTex, i.uv).rgb * lerp(_Color, _ColorTwo, d);
 
                 const half3 worldNormal = normalize(i.worldNormal);
 
@@ -114,7 +116,7 @@ Shader "LuB/NewToonGradient"
 
                 Surface surface;
                 surface.position = i.worldPos;
-                surface.color = col.rgb;
+                surface.color = col.rgb * i.color;
                 surface.fong = fong;
                 surface.normal = worldNormal;
                 surface.shadow = 0;

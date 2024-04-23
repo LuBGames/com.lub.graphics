@@ -67,10 +67,12 @@ Shader "LuB/NewToonStencil"
             #pragma shader_feature USE_FRESNEL
             #pragma shader_feature USE_FRESNEL_REFLECT
             #pragma shader_feature USE_BAKED_SHADOWS
+            #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "baseFragment.cginc"
+            #include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -99,6 +101,7 @@ Shader "LuB/NewToonStencil"
                 o.uv2 = v.uv2;
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.color = _LightColor0 * _Color * _Multiply;
                 
                 TRANSFER_SHADOW(o);
                 
@@ -107,7 +110,7 @@ Shader "LuB/NewToonStencil"
 
             fixed4 frag (FragData i) : SV_Target
             {
-                fixed3 col = tex2D(_MainTex, i.uv).rgb * _Color * _Multiply;
+                fixed3 col = tex2D(_MainTex, i.uv).rgb;
 
                 const half3 worldNormal = normalize(i.worldNormal);
 
@@ -115,7 +118,7 @@ Shader "LuB/NewToonStencil"
 
                 Surface surface;
                 surface.position = i.worldPos;
-                surface.color = col.rgb;
+                surface.color = col.rgb * i.color;
                 surface.fong = fong;
                 surface.normal = worldNormal;
                 surface.shadow = 0;

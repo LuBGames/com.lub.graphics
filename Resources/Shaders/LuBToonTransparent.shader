@@ -56,7 +56,7 @@ Shader "LuB/NewToonTransparent"
             #pragma shader_feature USE_FRESNEL_REFLECT
 
             #include "UnityCG.cginc"
-            #include "AutoLight.cginc"
+            #include "UnityLightingCommon.cginc"
 
             #ifdef USE_FOG
             #include "fogTransparent.cginc"
@@ -160,6 +160,7 @@ Shader "LuB/NewToonTransparent"
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv) * lerp(_Color, _Highlight, _Highlight.a) * _Multiply;
+                col.rgb *= _LightColor0.rgb;
 
                 const fixed fong = dot(_WorldSpaceLightPos0.xyz, normalize(i.worldNormal));
 
