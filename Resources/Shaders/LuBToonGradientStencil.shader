@@ -109,7 +109,7 @@ Shader "LuB/NewToonGradientStencil"
                 o.uv2 = v.uv2;
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-                o.color = _LightColor0 * _Multiply;
+                o.color = _Multiply;
                 
                 TRANSFER_SHADOW(o);
                 

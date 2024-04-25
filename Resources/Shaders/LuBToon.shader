@@ -98,7 +98,7 @@ Shader "LuB/NewToon"
                 o.uv2 = v.uv2;
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-                o.color = _LightColor0 * _Color * _Multiply;
+                o.color = _Color * _Multiply;
                 #if !defined(OFF_SHADESH9) && defined(USE_SHADE_SH9)
                 o.color += ShadeSH9(half4(v.normal, 1));
                 #endif

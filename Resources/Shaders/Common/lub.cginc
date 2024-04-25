@@ -87,9 +87,9 @@ inline Surface ApplyShading (Surface surface)
     fixed fong = smoothstep(_LitTrashHold - _LitSoftness*2, _LitTrashHold + _LitSoftness, surface.fong);
     fong = saturate(fong);
     #if defined(USE_SHADOW_COLOR_FOR_SHADING)
-    surface.color = lerp(unity_ShadowColor * surface.color, surface.color, fong);
+    surface.color = lerp(unity_ShadowColor * surface.color, surface.color * _LightColor0, fong);
     #else
-    surface.color = lerp(_ShadingColor * surface.color, surface.color, fong);
+    surface.color = lerp(_ShadingColor * surface.color, surface.color * _LightColor0, fong);
     #endif
     return surface;
 }

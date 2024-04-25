@@ -175,7 +175,7 @@ Shader "LuB/NewToonTransparent"
                 col.rgb = ApplyShading(col, fong);
                 
                 #ifdef USE_FOG
-                col.rgb = ApplyFog(col, i);
+                col.rgb = ApplyFog(col, i.worldPos);
                 #endif
                 
                 return col;

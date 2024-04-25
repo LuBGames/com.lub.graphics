@@ -101,7 +101,7 @@ Shader "LuB/NewToonStencil"
                 o.uv2 = v.uv2;
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-                o.color = _LightColor0 * _Color * _Multiply;
+                o.color = _Color * _Multiply;
                 
                 TRANSFER_SHADOW(o);
                 
