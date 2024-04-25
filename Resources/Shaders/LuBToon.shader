@@ -54,6 +54,8 @@ Shader "LuB/NewToon"
 
             #pragma multi_compile_instancing
 
+            #pragma shader_feature USE_CUTOUT
+
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "Common/baseFragment.cginc"
@@ -97,7 +99,7 @@ Shader "LuB/NewToon"
                 fixed4 col = tex2D(_MainTex, i.uv);
 
                 #if defined(USE_CUTOUT)
-                clip(col.a - 0.1);
+                clip(col.a - 0.5);
                 #endif
 
                 const half3 worldNormal = normalize(i.worldNormal);
