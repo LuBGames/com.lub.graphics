@@ -51,8 +51,6 @@ Shader "LuB/NewToon"
 
             #pragma multi_compile_instancing
 
-            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
-
             #pragma shader_feature SHADOWS_SCREEN
             
             #pragma shader_feature USE_FOG

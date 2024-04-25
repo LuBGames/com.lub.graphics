@@ -15,7 +15,7 @@ float4 _BakedShadows_ST;
 fixed3 ComputeBase(Surface surface, FragData fd)
 {
     #ifdef SHADOWS_SCREEN
-    fixed shadow = LIGHT_ATTENUATION(fd);
+    fixed shadow = SHADOW_ATTENUATION(fd);
     #else
     fixed shadow = 1;
     #endif

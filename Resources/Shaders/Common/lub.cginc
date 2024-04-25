@@ -19,7 +19,7 @@ struct FragData
     float2 uv : TEXCOORD0;
     float2 uv2 : TEXCOORD1;
     half3 color : COLOR;
-    unityShadowCoord4 _ShadowCoord : TEXCOORD3;
+    SHADOW_COORDS(3)
     float3 worldPos : TEXCOORD4;
 };
 
