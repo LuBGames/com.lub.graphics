@@ -75,7 +75,7 @@ Shader "LuB/NewToonGradientStencil"
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
-            #include "baseFragment.cginc"
+            #include "Common/baseFragment.cginc"
             #include "UnityLightingCommon.cginc"
 
             struct appdata

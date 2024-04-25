@@ -63,7 +63,7 @@ Shader "LuB/NewToonTriplanar"
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
-            #include "baseFragment.cginc"
+            #include "Common/baseFragment.cginc"
 
             struct appdata
             {

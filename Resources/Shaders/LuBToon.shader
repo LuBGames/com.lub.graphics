@@ -51,6 +51,8 @@ Shader "LuB/NewToon"
 
             #pragma multi_compile_instancing
 
+            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+
             #pragma shader_feature SHADOWS_SCREEN
             
             #pragma shader_feature USE_FOG
@@ -63,7 +65,7 @@ Shader "LuB/NewToon"
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
-            #include "baseFragment.cginc"
+            #include "Common/baseFragment.cginc"
             #include "UnityLightingCommon.cginc"
 
             struct appdata

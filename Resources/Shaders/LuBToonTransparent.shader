@@ -59,7 +59,7 @@ Shader "LuB/NewToonTransparent"
             #include "UnityLightingCommon.cginc"
 
             #ifdef USE_FOG
-            #include "fogTransparent.cginc"
+            #include "Common/fogTransparent.cginc"
             #endif
             
 

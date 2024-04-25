@@ -24,7 +24,7 @@
 			float3 _Up;
 			float _Exp;
 
-			#include "skybox.cginc"
+			#include "Common/skybox.cginc"
 
 			struct appdata {
 				float4 vertex : POSITION;
