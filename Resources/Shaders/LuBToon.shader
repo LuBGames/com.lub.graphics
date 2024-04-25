@@ -33,6 +33,9 @@ Shader "LuB/NewToon"
         [Space(20)]
         [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
         _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
+        
+        [Space(20)]
+        [Toggle(USE_CUTOUT)] _UseCutout ("Use Cutout", Float) = 0
     }
     SubShader
     {
@@ -56,6 +59,7 @@ Shader "LuB/NewToon"
             #pragma shader_feature USE_FRESNEL_REFLECT
             #pragma shader_feature USE_BAKED_SHADOWS
             #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
+            #pragma shader_feature USE_CUTOUT
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -98,7 +102,11 @@ Shader "LuB/NewToon"
 
             fixed4 frag (FragData i) : SV_Target
             {
-                fixed3 col = tex2D(_MainTex, i.uv).rgb;
+                fixed4 col = tex2D(_MainTex, i.uv);
+
+                #if defined(USE_CUTOUT)
+                clip(col.a - 0.1);
+                #endif
 
                 const half3 worldNormal = normalize(i.worldNormal);
 
