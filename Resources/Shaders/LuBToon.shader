@@ -36,6 +36,9 @@ Shader "LuB/NewToon"
         
         [Space(20)]
         [Toggle(USE_CUTOUT)] _UseCutout ("Use Cutout", Float) = 0
+        
+        [Space(20)]
+        [Toggle(OFF_SHADESH9)] _NoUseExpensiveShading ("Off Shade SH9", Float) = 0
     }
     SubShader
     {
@@ -60,6 +63,8 @@ Shader "LuB/NewToon"
             #pragma shader_feature USE_BAKED_SHADOWS
             #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
             #pragma shader_feature USE_CUTOUT
+            #pragma shader_feature OFF_SHADESH9
+            #pragma shader_feature USE_SHADE_SH9
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -94,6 +99,9 @@ Shader "LuB/NewToon"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.color = _LightColor0 * _Color * _Multiply;
+                #if !defined(OFF_SHADESH9) && defined(USE_SHADE_SH9)
+                o.color += ShadeSH9(half4(v.normal, 1));
+                #endif
                 
                 TRANSFER_SHADOW(o);
                 
@@ -118,7 +126,7 @@ Shader "LuB/NewToon"
                 surface.fong = fong;
                 surface.normal = worldNormal;
                 surface.shadow = 0;
-
+                
                 return fixed4(ComputeBase(surface, i), 1);
             }
             ENDCG

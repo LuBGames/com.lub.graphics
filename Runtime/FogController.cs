@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace LuB.Graphics
 {
@@ -9,12 +8,9 @@ namespace LuB.Graphics
         public Vector3 FogAxis;
         public float FogScale;
 
-        public bool UseShadowColorForShading;
-
         private void OnValidate()
         {
             UpdateState();
-            Shader.SetKeyword(GlobalKeyword.Create("USE_SHADOW_COLOR_FOR_SHADING"), UseShadowColorForShading);
         }
 
         private void LateUpdate()
