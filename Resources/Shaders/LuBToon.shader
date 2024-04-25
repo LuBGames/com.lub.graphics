@@ -54,22 +54,9 @@ Shader "LuB/NewToon"
 
             #pragma multi_compile_instancing
 
-            #pragma shader_feature SHADOWS_SCREEN
-            
-            #pragma shader_feature USE_FOG
-            #pragma shader_feature USE_SPECULAR
-            #pragma shader_feature USE_FRESNEL
-            #pragma shader_feature USE_FRESNEL_REFLECT
-            #pragma shader_feature USE_BAKED_SHADOWS
-            #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
-            #pragma shader_feature USE_CUTOUT
-            #pragma shader_feature OFF_SHADESH9
-            #pragma shader_feature USE_SHADE_SH9
-
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "Common/baseFragment.cginc"
-            #include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -99,11 +86,8 @@ Shader "LuB/NewToon"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.color = _Color * _Multiply;
-                #if !defined(OFF_SHADESH9) && defined(USE_SHADE_SH9)
-                o.color += ShadeSH9(half4(v.normal, 1));
-                #endif
-                
-                TRANSFER_SHADOW(o);
+                COMPUTE_AMBIENT(o)
+                TRANSFER_SHADOW(o)
                 
                 return o;
             }

@@ -3,13 +3,27 @@
 
 #include "UnityLightingCommon.cginc"
 
+#if !defined(OFF_SHADESH9) && defined(USE_SHADE_SH9)
+#define USED_SHADE_SH9
+#endif
+
+#if defined(USED_SHADE_SH9)
+#define COMPUTE_AMBIENT(o) o.ambient = ShadeSH9(half4(o.worldNormal, 1));
+#else
+#define COMPUTE_AMBIENT(o)
+#endif
+
 struct Surface
 {
-    half3 color;
+    fixed3 color;
+    fixed3 diff;
     half3 position;
     half3 normal;
     fixed shadow;
     fixed fong;
+    #if defined(USED_SHADE_SH9)
+    fixed3 ambient;
+    #endif
 };
 
 struct FragData
@@ -18,9 +32,12 @@ struct FragData
     float3 worldNormal : NORMAL;
     float2 uv : TEXCOORD0;
     float2 uv2 : TEXCOORD1;
-    half3 color : COLOR;
+    fixed3 color : COLOR;
     SHADOW_COORDS(3)
     float3 worldPos : TEXCOORD4;
+    #if defined(USED_SHADE_SH9)
+    fixed3 ambient : COLOR1;
+    #endif
 };
 
 fixed4 _SpecularColor;
@@ -73,8 +90,8 @@ inline Surface ApplyFresnel(Surface surface)
 
 inline Surface ApplyShadows (Surface surface)
 {
-    fixed shadow = lerp(1, surface.shadow, max(surface.fong, 0));
-    surface.color *= lerp(unity_ShadowColor, 1, shadow);
+    const fixed shadow = lerp(1, surface.shadow, max(surface.fong, 0));
+    surface.diff *= lerp(unity_ShadowColor, 1, shadow);
     return surface;
 }
 
@@ -87,9 +104,9 @@ inline Surface ApplyShading (Surface surface)
     fixed fong = smoothstep(_LitTrashHold - _LitSoftness*2, _LitTrashHold + _LitSoftness, surface.fong);
     fong = saturate(fong);
     #if defined(USE_SHADOW_COLOR_FOR_SHADING)
-    surface.color = lerp(unity_ShadowColor * surface.color, surface.color * _LightColor0, fong);
+    surface.diff = lerp(unity_ShadowColor, _LightColor0, fong);
     #else
-    surface.color = lerp(_ShadingColor * surface.color, surface.color * _LightColor0, fong);
+    surface.diff = lerp(_ShadingColor, _LightColor0, fong);
     #endif
     return surface;
 }

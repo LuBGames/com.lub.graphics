@@ -42,6 +42,9 @@ Shader "LuB/NewToonGradientStencil"
         [Space(20)]
         [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
         _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
+        
+        [Space(20)]
+        [Toggle(OFF_SHADESH9)] _NoUseExpensiveShading ("Off Shade SH9", Float) = 0
     }
     SubShader
     {
@@ -64,19 +67,9 @@ Shader "LuB/NewToonGradientStencil"
 
             #pragma multi_compile_instancing
 
-            #pragma shader_feature SHADOWS_SCREEN
-            
-            #pragma shader_feature USE_FOG
-            #pragma shader_feature USE_SPECULAR
-            #pragma shader_feature USE_FRESNEL
-            #pragma shader_feature USE_FRESNEL_REFLECT
-            #pragma shader_feature USE_BAKED_SHADOWS
-            #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
-
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "Common/baseFragment.cginc"
-            #include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -111,7 +104,8 @@ Shader "LuB/NewToonGradientStencil"
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.color = _Multiply;
                 
-                TRANSFER_SHADOW(o);
+                COMPUTE_AMBIENT(o)
+                TRANSFER_SHADOW(o)
                 
                 return o;
             }

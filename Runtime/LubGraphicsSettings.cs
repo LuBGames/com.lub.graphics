@@ -7,7 +7,7 @@ namespace LuB.Graphics
     {
         public bool UseShadowColorForShading;
         public bool UseExpensiveShading;
-        
+
         private void OnValidate()
         {
             UpdateSettings();

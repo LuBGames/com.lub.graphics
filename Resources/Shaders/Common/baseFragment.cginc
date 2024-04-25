@@ -3,6 +3,17 @@
 
 #include "lub.cginc"
 
+#pragma shader_feature SHADOWS_SCREEN
+            
+#pragma shader_feature USE_FOG
+#pragma shader_feature USE_SPECULAR
+#pragma shader_feature USE_FRESNEL
+#pragma shader_feature USE_FRESNEL_REFLECT
+#pragma shader_feature USE_BAKED_SHADOWS
+#pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
+#pragma shader_feature OFF_SHADESH9
+#pragma shader_feature USE_SHADE_SH9
+
 #ifdef USE_FOG
 #include "fog.cginc"
 #endif
@@ -27,9 +38,7 @@ fixed3 ComputeBase(Surface surface, FragData fd)
 
     surface.shadow = shadow;
 
-    #if defined(SHADOWS_SCREEN) || defined(USE_BAKED_SHADOWS)
-    surface = ApplyShadows(surface);
-    #endif
+    surface = ApplyShading(surface);
 
     #ifdef USE_FRESNEL
     surface = ApplyFresnel(surface);
@@ -39,13 +48,19 @@ fixed3 ComputeBase(Surface surface, FragData fd)
     surface = ApplySpecular(surface);
     #endif
 
-    surface = ApplyShading(surface);
+    #if defined(SHADOWS_SCREEN) || defined(USE_BAKED_SHADOWS)
+    surface = ApplyShadows(surface);
+    #endif
+
+    #if defined(USED_SHADE_SH9)
+    surface.diff += fd.ambient;
+    #endif
                     
     #ifdef USE_FOG
     surface = ApplyFog(surface);
     #endif
                     
-    return surface.color;
+    return surface.color * surface.diff;
 }
 
 #endif

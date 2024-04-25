@@ -37,6 +37,9 @@ Shader "LuB/NewToonTriplanar"
         [Space(20)]
         [Toggle(USE_BAKED_SHADOWS)] _UseBakedShadows ("Use Baked Shadows", Float) = 0
         _BakedShadows ("Baked Shadows Texture", 2D) = "black" {}
+    	
+    	[Space(20)]
+        [Toggle(OFF_SHADESH9)] _NoUseExpensiveShading ("Off Shade SH9", Float) = 0
     }
     SubShader
     {
@@ -51,15 +54,6 @@ Shader "LuB/NewToonTriplanar"
             #pragma fragment frag
 
             #pragma multi_compile_instancing
-
-            #pragma shader_feature SHADOWS_SCREEN
-            
-            #pragma shader_feature USE_FOG
-            #pragma shader_feature USE_SPECULAR
-            #pragma shader_feature USE_FRESNEL
-            #pragma shader_feature USE_FRESNEL_REFLECT
-            #pragma shader_feature USE_BAKED_SHADOWS
-            #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
 
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
@@ -106,8 +100,10 @@ Shader "LuB/NewToonTriplanar"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-                
-                TRANSFER_SHADOW(o);
+				o.color = _Color * _Multiply;
+            	
+                COMPUTE_AMBIENT(o)
+                TRANSFER_SHADOW(o)
                 
                 return o;
             }
@@ -151,15 +147,13 @@ Shader "LuB/NewToonTriplanar"
 
             	fixed4 col = albedoX * triW.x + albedoY * triW.y + albedoZ * triW.z;
 
-            	col *= _Color * _Multiply;
-
                 const half3 worldNormal = normalize(i.worldNormal);
 
                 const fixed fong = dot(_WorldSpaceLightPos0.xyz, worldNormal);
 
                 Surface surface;
                 surface.position = i.worldPos;
-                surface.color = col.rgb;
+                surface.color = col.rgb * i.color;
                 surface.fong = fong;
                 surface.normal = worldNormal;
                 surface.shadow = 0;
