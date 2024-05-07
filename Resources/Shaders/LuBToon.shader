@@ -17,8 +17,9 @@ Shader "LuB/NewToon"
         _LitSoftness ("Lit Softness", Range(0,1)) = 1
         
         [Space(20)]
-        [Toggle(USE_SPECULAR)] _UseSpecular ("Use Specular", Float) = 0
+        [KeywordEnum(None, Standard, Toon)] _Use_Specular ("Use Specular", Float) = 0
         _SpecularSize ("Specular Size", Range(0.01,1)) = 0
+        _SpecBlend ("Specular Blend", Range(0.0,1.0)) = 0
         
         [Space(20)]
         [Toggle(USE_FRESNEL)] _UseFresnel ("Use Fresnel", Float) = 0
@@ -52,13 +53,11 @@ Shader "LuB/NewToon"
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma multi_compile_instancing
-
-            #pragma shader_feature USE_CUTOUT
-
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "Common/baseFragment.cginc"
+
+            #pragma shader_feature USE_CUTOUT
 
             struct appdata
             {
@@ -66,7 +65,6 @@ Shader "LuB/NewToon"
                 float2 uv : TEXCOORD0;
                 float2 uv2 : TEXCOORD1;
                 float3 normal : NORMAL;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             sampler2D _MainTex;
@@ -79,8 +77,6 @@ Shader "LuB/NewToon"
 
             FragData vert (appdata v)
             {
-                UNITY_SETUP_INSTANCE_ID(v);
-                
                 FragData o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -111,6 +107,7 @@ Shader "LuB/NewToon"
                 surface.color = col.rgb * i.color;
                 surface.fong = fong;
                 surface.normal = worldNormal;
+                surface.diff = 0;
                 surface.shadow = 0;
                 
                 return fixed4(ComputeBase(surface, i), 1);

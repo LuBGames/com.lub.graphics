@@ -42,18 +42,34 @@ struct FragData
 
 fixed4 _SpecularColor;
 fixed _SpecularSize;
+fixed _SpecBlend;
 
 inline Surface ApplySpecular (Surface surface)
 {
-    const fixed3 normLightDir = normalize(_WorldSpaceLightPos0);
-    const fixed3 viewVec = normalize(surface.position - _WorldSpaceCameraPos);
-    const fixed3 refLight = reflect(normLightDir, surface.normal);
+    const half3 normLightDir = normalize(_WorldSpaceLightPos0);
+    const half3 viewVec = normalize(surface.position - _WorldSpaceCameraPos);
+    const half3 refLight = reflect(normLightDir, surface.normal);
     const fixed dotRef = max(0, dot(refLight, viewVec));
     const fixed spec = pow(dotRef, 32.0 * _SpecularSize);
 
     const fixed blendSpec = _SpecularColor.a * smoothstep(0,1, surface.shadow);
 
     surface.color += lerp(0, spec, blendSpec) * _SpecularColor.rgb * _LightColor0.rgb;
+
+    return surface;
+}
+
+inline Surface ApplySpecularToon (Surface surface)
+{
+    const half3 normLightDir = normalize(_WorldSpaceLightPos0);
+    const half3 viewVec = normalize(surface.position - _WorldSpaceCameraPos);
+    const half3 refLight = reflect(normLightDir, surface.normal);
+    const fixed dotRef = max(0, dot(refLight, viewVec));
+
+    const fixed blendSpec = _SpecularColor.a * smoothstep(0,1, surface.shadow);
+    const fixed specSize = 1.0 - _SpecularSize;
+    
+    surface.color += smoothstep(specSize - _SpecBlend, specSize + _SpecBlend, dotRef) * blendSpec * _SpecularColor.rgb * _LightColor0.rgb;
 
     return surface;
 }

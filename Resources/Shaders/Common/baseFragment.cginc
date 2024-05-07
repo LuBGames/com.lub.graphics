@@ -1,18 +1,16 @@
 ﻿#ifndef CUSTOM_BASEFRAGMENT_INCLUDED
 #define CUSTOM_BASEFRAGMENT_INCLUDED
 
-#include "lub.cginc"
-
 #pragma shader_feature SHADOWS_SCREEN
             
 #pragma shader_feature USE_FOG
-#pragma shader_feature USE_SPECULAR
+#pragma shader_feature _USE_SPECULAR_NONE _USE_SPECULAR_STANDARD _USE_SPECULAR_TOON
 #pragma shader_feature USE_FRESNEL
 #pragma shader_feature USE_FRESNEL_REFLECT
-#pragma shader_feature USE_BAKED_SHADOWS
 #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
-#pragma shader_feature OFF_SHADESH9
-#pragma shader_feature USE_SHADE_SH9
+#pragma shader_feature OFF_SHADESH9 USE_SHADE_SH9
+
+#include "lub.cginc"
 
 #ifdef USE_FOG
 #include "fog.cginc"
@@ -44,8 +42,10 @@ fixed3 ComputeBase(Surface surface, FragData fd)
     surface = ApplyFresnel(surface);
     #endif
 
-    #ifdef USE_SPECULAR
+    #ifdef _USE_SPECULAR_STANDARD
     surface = ApplySpecular(surface);
+    #elif _USE_SPECULAR_TOON
+    surface = ApplySpecularToon(surface);
     #endif
 
     #if defined(SHADOWS_SCREEN) || defined(USE_BAKED_SHADOWS)
