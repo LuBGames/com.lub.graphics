@@ -22,8 +22,7 @@ Shader "LuB/NewToon"
         _SpecBlend ("Specular Blend", Range(0.0,1.0)) = 0
         
         [Space(20)]
-        [Toggle(USE_FRESNEL)] _UseFresnel ("Use Fresnel", Float) = 0
-        [Toggle(USE_FRESNEL_REFLECT)] _UseFresnelReflect ("Use Fresnel Reflect", Float) = 0
+        [KeywordEnum(None, Standard, Reflect)] _Use_Fresnel ("Use Fresnel", Float) = 0
         _SpecularTexture ("Specular Texture", CUBE) = "white" {}
         _FresnelColor ("Fresnel Color", Color) = (1,1,1,1)
         _FresnelBase ("Fresnel Base", Range(0, 1)) = 0

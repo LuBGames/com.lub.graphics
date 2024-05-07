@@ -77,7 +77,7 @@ inline Surface ApplySpecularToon (Surface surface)
 fixed4 _FresnelColor;
 fixed _FresnelBase;
 
-#ifdef USE_FRESNEL_REFLECT
+#ifdef _USE_FRESNEL_REFLECT
 samplerCUBE _SpecularTexture;
 #endif
 
@@ -91,7 +91,7 @@ inline Surface ApplyFresnel(Surface surface)
 
     fresnel *= _FresnelColor.a;
 
-    #ifdef USE_FRESNEL_REFLECT
+    #ifdef _USE_FRESNEL_REFLECT
     const fixed4 refSample = texCUBE(_SpecularTexture, surface.normal);
 
     fixed3 fresnelComp = lerp(0, refSample.rgb * _FresnelColor.rgb * _LightColor0.rgb, fresnel);

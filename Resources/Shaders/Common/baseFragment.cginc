@@ -5,8 +5,7 @@
             
 #pragma shader_feature USE_FOG
 #pragma shader_feature _USE_SPECULAR_NONE _USE_SPECULAR_STANDARD _USE_SPECULAR_TOON
-#pragma shader_feature USE_FRESNEL
-#pragma shader_feature USE_FRESNEL_REFLECT
+#pragma shader_feature _ _USE_FRESNEL_STANDARD _USE_FRESNEL_REFLECT
 #pragma shader_feature USE_SHADOW_COLOR_FOR_SHADING
 #pragma shader_feature OFF_SHADESH9 USE_SHADE_SH9
 
@@ -38,7 +37,7 @@ fixed3 ComputeBase(Surface surface, FragData fd)
 
     surface = ApplyShading(surface);
 
-    #ifdef USE_FRESNEL
+    #if defined(_USE_FRESNEL_STANDARD) | defined(_USE_FRESNEL_REFLECT)
     surface = ApplyFresnel(surface);
     #endif
 
