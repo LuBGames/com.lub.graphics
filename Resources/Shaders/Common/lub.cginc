@@ -43,6 +43,7 @@ struct FragData
 fixed4 _SpecularColor;
 fixed _SpecularSize;
 fixed _SpecBlend;
+float _ShadowFadeStart, _ShadowFadeEnd;
 
 inline Surface ApplySpecular (Surface surface)
 {
@@ -106,7 +107,10 @@ inline Surface ApplyFresnel(Surface surface)
 
 inline Surface ApplyShadows (Surface surface)
 {
-    const fixed shadow = lerp(1, surface.shadow, max(surface.fong, 0));
+    fixed shadow = lerp(1, surface.shadow, max(surface.fong, 0));
+    float dist = distance(surface.position, _WorldSpaceCameraPos);
+    float fade = 1 - saturate(1 - (dist - _ShadowFadeStart) / (_ShadowFadeEnd - _ShadowFadeStart));
+    shadow = max(shadow, fade);
     surface.diff *= lerp(unity_ShadowColor, 1, shadow);
     return surface;
 }
