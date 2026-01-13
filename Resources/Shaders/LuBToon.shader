@@ -52,6 +52,8 @@ Shader "LuB/NewToon"
             #pragma vertex vert
             #pragma fragment frag
 
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
+            
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             #include "Common/baseFragment.cginc"
@@ -83,6 +85,9 @@ Shader "LuB/NewToon"
                 o.worldNormal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.color = _Color * _Multiply;
+                #ifdef LOD_FADE_CROSSFADE
+                o.screenPos = ComputeScreenPos(o.vertex);
+                #endif
                 COMPUTE_AMBIENT(o)
                 TRANSFER_SHADOW(o)
                 

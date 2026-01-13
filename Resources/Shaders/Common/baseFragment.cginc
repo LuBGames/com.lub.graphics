@@ -15,6 +15,13 @@
 #include "fog.cginc"
 #endif
 
+#ifdef LOD_FADE_CROSSFADE
+float Rand01(float2 co)
+{
+    return frac(sin(dot(co, float2(12.9898,78.233))) * 43758.5453);
+}
+#endif
+
 #ifdef USE_BAKED_SHADOWS
 sampler2D _BakedShadows;
 float4 _BakedShadows_ST;
@@ -22,6 +29,11 @@ float4 _BakedShadows_ST;
 
 fixed3 ComputeBase(Surface surface, FragData fd)
 {
+    #ifdef LOD_FADE_CROSSFADE
+    float2 vpos = fd.screenPos.xy / fd.screenPos.w * _ScreenParams.xy;
+    UnityApplyDitherCrossFade(vpos);
+    #endif
+    
     #ifdef SHADOWS_SCREEN
     fixed shadow = SHADOW_ATTENUATION(fd);
     #else

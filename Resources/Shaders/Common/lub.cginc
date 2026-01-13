@@ -35,6 +35,9 @@ struct FragData
     fixed3 color : COLOR;
     SHADOW_COORDS(3)
     float3 worldPos : TEXCOORD4;
+    #ifdef LOD_FADE_CROSSFADE
+    float4 screenPos : TEXCOORD2;
+    #endif
     #if defined(USED_SHADE_SH9)
     fixed3 ambient : COLOR1;
     #endif
