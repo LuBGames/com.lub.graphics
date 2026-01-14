@@ -2,10 +2,9 @@
 
 namespace LuB.Graphics
 {
+    [ExecuteAlways]
     public class FogController : MonoBehaviour
     {
-        public Vector3 FogOffset;
-        public Vector3 FogAxis;
         public float FogScale;
 
         private void OnValidate()
@@ -20,8 +19,9 @@ namespace LuB.Graphics
 
         private void UpdateState()
         {
-            Shader.SetGlobalVector("FogOffset", FogOffset);
-            Shader.SetGlobalVector("FogAxis", FogAxis);
+            var vec = transform.position;
+            Shader.SetGlobalVector("FogOffset", transform.position);
+            Shader.SetGlobalVector("FogAxis", -transform.forward);
             Shader.SetGlobalFloat("FogScale", FogScale);
         }
     }

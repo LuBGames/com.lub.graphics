@@ -4,16 +4,16 @@
 #include "skybox.cginc"
 #include "lub.cginc"
 
-fixed3 FogOffset;
-fixed3 FogAxis;
+half3 FogOffset;
+half3 FogAxis;
 fixed FogScale;
 
 fixed GetFog (fixed3 pos)
 {
-    fixed3 napr = pos * FogAxis;
+    fixed3 napr = (pos - FogOffset) * FogAxis;
     fixed fx = -(napr.x + napr.y + napr.z);
 
-    return clamp((fx - FogOffset) * FogScale, 0.0, 1.0);
+    return clamp(fx * FogScale, 0.0, 1.0);
 }
 
 inline Surface ApplyFog (Surface surface)
